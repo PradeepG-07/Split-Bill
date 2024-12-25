@@ -21,5 +21,15 @@ const envSchema = z.object({
 	}),
 });
 
-export { envSchema };
+const signUpSchema = z.object({
+	full_name: z.string({ message: "Full Name is required." }),
+	email: z
+		.string({ message: "Email is required." })
+		.email("Invalid email format."),
+	username: z.string({ message: "Username is required." }),
+	password: z
+		.string({ message: "Password is required." })
+		.min(6, "Password should contain at least 6 characters."),
+});
+export { envSchema, signUpSchema };
 

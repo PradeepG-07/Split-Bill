@@ -1,5 +1,8 @@
 import { Request } from "express";
-export type AuthorizedExpressRequest = Request & { user: { id?: string } };
+import { Schema } from "mongoose";
+export type AuthorizedExpressRequest = Request & {
+	user: { id: Schema.Types.ObjectId };
+};
 
 declare module "jsonwebtoken" {
 	export interface JwtPayload {

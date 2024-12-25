@@ -17,3 +17,5 @@ const asyncHandler = (requestHandler: asyncRequestHandlerFunction) => {
 		}
 	};
 };
+export default asyncHandler;
+
