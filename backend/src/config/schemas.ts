@@ -31,5 +31,10 @@ const signUpSchema = z.object({
 		.string({ message: "Password is required." })
 		.min(6, "Password should contain at least 6 characters."),
 });
-export { envSchema, signUpSchema };
+
+const loginSchema = z.object({
+	username_or_email: z.string({ message: "Username or Email is required." }),
+	password: z.string({ message: "Password is required." }),
+});
+export { envSchema, signUpSchema, loginSchema };
 
