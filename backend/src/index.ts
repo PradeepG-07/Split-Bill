@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import "dotenv/config";
-import cleanedEnv from "./utils/cleanedEnv";
+import cleanedEnv from "./config/cleanedEnv";
 import app from "./app";
 
 mongoose
@@ -19,3 +19,4 @@ mongoose
 	.catch((err) => {
 		console.log("Error while connecting to MongoDB", err);
 	});
+

@@ -1,4 +1,4 @@
-import { envSchema } from "../config/schemas";
+import { envSchema } from "./schemas";
 
 const { data: cleanedEnv, error } = envSchema.safeParse(process.env);
 if (error) {
