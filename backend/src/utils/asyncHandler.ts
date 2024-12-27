@@ -1,12 +1,14 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { ApiError } from "./ApiError";
 
-interface asyncRequestHandlerFunction {
-	(req: Request, res: Response, next: NextFunction): Promise<void>;
+export interface asyncRequestHandlerFunction<T = Request> {
+	(req: T, res: Response, next: NextFunction): Promise<void>;
 }
 
-const asyncHandler = (requestHandler: asyncRequestHandlerFunction) => {
-	return async (req: Request, res: Response, next: NextFunction) => {
+const asyncHandler = <T = Request>(
+	requestHandler: asyncRequestHandlerFunction<T>
+) => {
+	return async (req: T, res: Response, next: NextFunction) => {
 		try {
 			await requestHandler(req, res, next);
 		} catch (error) {
