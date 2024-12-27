@@ -6,7 +6,7 @@ export interface IUser extends Document {
 	full_name: string;
 	username: string;
 	email: string;
-	profile_url: string;
+	profile_pic_url: string;
 	password: string;
 	created_bills: Schema.Types.ObjectId[];
 	friends: string[];
@@ -39,7 +39,7 @@ const userSchema = new Schema<IUser>(
 				"Please fill a valid email address",
 			],
 		},
-		profile_url: {
+		profile_pic_url: {
 			type: Schema.Types.String,
 			default:
 				"https://res.cloudinary.com/deeetmc3c/image/upload/v1735126244/split-bill-app/profile-images/default.png",

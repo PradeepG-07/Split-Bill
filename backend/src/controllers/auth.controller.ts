@@ -20,7 +20,7 @@ export const signUp = asyncHandler(async (req: Request, res: Response) => {
 	const { data, error } = signUpSchema.safeParse(body);
 	if (error) {
 		const zodErrors = extractZodErrorMessages(error);
-		res.json(new ApiError(422, "Invalid Params", zodErrors));
+		res.status(422).json(new ApiError(422, "Invalid Params", zodErrors));
 		return;
 	}
 
@@ -29,7 +29,7 @@ export const signUp = asyncHandler(async (req: Request, res: Response) => {
 		username: data.username,
 	});
 	if (existingUser) {
-		res.json(
+		res.status(409).json(
 			new ApiError(409, "User already exists.", ["User already exists"])
 		);
 		return;
@@ -44,13 +44,17 @@ export const signUp = asyncHandler(async (req: Request, res: Response) => {
 
 	//if validation fails respond back with errors
 	if (mongooseErrors) {
-		res.json(new ApiError(422, "Invalid Params", mongooseErrors));
+		res.status(422).json(
+			new ApiError(422, "Invalid Params", mongooseErrors)
+		);
 		return;
 	}
 
 	//save the user and respond with new user info
 	await newUser.save();
-	res.json(new ApiResponse(201, newUser, "User created successfully."));
+	res.status(201).json(
+		new ApiResponse(201, newUser, "User created successfully.")
+	);
 	return;
 });
 
@@ -60,7 +64,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 	const { data, error } = loginSchema.safeParse(req.body);
 	if (error) {
 		const zodErrors = extractZodErrorMessages(error);
-		res.json(new ApiError(422, "Invalid Params", zodErrors));
+		res.status(422).json(new ApiError(422, "Invalid Params", zodErrors));
 		return;
 	}
 	//Check for existing user
@@ -76,7 +80,9 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 	});
 	//If user does not exist, respond with invalid credentials
 	if (!existingUser) {
-		res.json(new ApiError(400, "Bad Request", ["Invalid Credentials."]));
+		res.status(400).json(
+			new ApiError(400, "Bad Request", ["Invalid Credentials."])
+		);
 		return;
 	}
 	//Though user exist and password is incorrect, respond with invalid credentials
@@ -84,7 +90,9 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 		data.password
 	);
 	if (!isPasswordCorrect) {
-		res.json(new ApiError(400, "Bad Request", ["Invalid Credentials."]));
+		res.status(400).json(
+			new ApiError(400, "Bad Request", ["Invalid Credentials."])
+		);
 		return;
 	}
 	//If password is correct, sign a token with encrypted id and send it back
@@ -103,7 +111,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 		username: existingUser.username,
 		email: existingUser.email,
 		friends: existingUser.friends,
-		profile_url: existingUser.profile_url,
+		profile_pic_url: existingUser.profile_pic_url,
 	};
 
 	//set cookie
@@ -114,7 +122,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 	});
 
 	//respond with token also
-	res.json(
+	res.status(200).json(
 		new ApiResponse(
 			200,
 			{ access_token, user: userDetails },
@@ -124,10 +132,10 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 });
 
 //Logout Controller
-export function logout(req: Request, res: Response) {
+export const logout = asyncHandler(async (req: Request, res: Response) => {
 	res.cookie("access_token", "", {
 		expires: new Date(Date.now() - 24 * 60 * 60),
 	});
-	res.json(new ApiResponse(200, {}, "Logged out successfully"));
-}
+	res.status(200).json(new ApiResponse(200, {}, "Logged out successfully"));
+});
 
