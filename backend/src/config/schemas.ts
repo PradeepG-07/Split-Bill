@@ -36,5 +36,24 @@ const loginSchema = z.object({
 	username_or_email: z.string({ message: "Username or Email is required." }),
 	password: z.string({ message: "Password is required." }),
 });
-export { envSchema, signUpSchema, loginSchema };
+
+const updatePasswordSchema = z.object({
+	current_password: z.string({ message: "Current Password is required." }),
+	new_password: z
+		.string({ message: "New password is required." })
+		.min(6, "Password should contain at least 6 characters."),
+});
+
+const updateDetailsSchema = z.object({
+	full_name: z.string().optional(),
+	username: z.string().optional(),
+	email: z.string().email({ message: "Invalid email format." }).optional(),
+});
+export {
+	envSchema,
+	signUpSchema,
+	loginSchema,
+	updatePasswordSchema,
+	updateDetailsSchema,
+};
 
