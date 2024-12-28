@@ -27,3 +27,7 @@ logs
 
 #builds
 build
+
+tmp
+tmp/*
+*.tsbuildinfo
