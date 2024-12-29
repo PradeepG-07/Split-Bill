@@ -37,7 +37,7 @@ const validateUser = async (
 			.status(498)
 			.json({ success: false, message: "Invalid user id." });
 	}
-	req.user = { id: user._id };
+	req.user = { id: user._id, username: user.username };
 	next();
 };
 

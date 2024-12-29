@@ -9,7 +9,6 @@ import { updateDetailsSchema, updatePasswordSchema } from "../config/schemas";
 import { extractZodErrorMessages } from "../utils/helpers";
 import uploadProfilePictureToCloudinary from "../utils/cloudinary";
 import path from "path";
-import fs from "fs";
 
 export const getDetails = asyncHandler(
 	async (req: AuthorizedExpressRequest, res: Response) => {
@@ -23,71 +22,19 @@ export const getDetails = asyncHandler(
 	}
 );
 
-export const getFriendsDetails = asyncHandler(
-	async (req: AuthorizedExpressRequest, res: Response) => {
-		const userId = req.user.id;
-		const friends = await User.aggregate<IUser>([
-			{
-				$match: {
-					_id: userId,
-				},
-			},
-			{
-				$lookup: {
-					from: "users",
-					localField: "friends.id",
-					foreignField: "_id",
-					as: "friends",
-					pipeline: [
-						{
-							$project: {
-								_id: 0,
-								email: 0,
-								password: 0,
-								friends: 0,
-								created_bills: 0,
-								createdAt: 0,
-								updatedAt: 0,
-								__v: 0,
-							},
-						},
-					],
-				},
-			},
-			{
-				$project: {
-					_id: 0,
-					email: 0,
-					password: 0,
-					full_name: 0,
-					username: 0,
-					profile_pic_url: 0,
-					created_bills: 0,
-					createdAt: 0,
-					updatedAt: 0,
-					__v: 0,
-				},
-			},
-		]);
-		res.status(200).json(
-			new ApiResponse(200, friends[0], "Friends fetched successfully.")
-		);
-	}
-);
-
 export const getOtherUserDetails = asyncHandler(
 	async (req: AuthorizedExpressRequest, res: Response) => {
 		const username: string = req.body?.other_user_username;
 		if (!username.trim()) {
 			res.status(422).json(
-				new ApiError(422, "Invalid username.", ["Invalid username."])
+				new ApiError(422, "Invalid params.", ["Username is required."])
 			);
 			return;
 		}
 		const user = await User.findOne({
 			username: username,
 		}).select(
-			"-_id -password -createdAt -updatedAt -__v -friends -created_bills -email -profile_pic_url"
+			"-_id -password -createdAt -updatedAt -__v -friends -created_bills -email"
 		);
 		if (!user) {
 			res.status(409).json(
@@ -113,11 +60,34 @@ export const updateDetails = asyncHandler(
 			return;
 		}
 		if (data?.username) {
-			const user = await User.findOne<IUser>({ username: data.username });
-			if (user && JSON.stringify(userId) != JSON.stringify(user._id)) {
+			const existingUserWithUsername = await User.findOne<IUser>({
+				username: data.username,
+			});
+			if (
+				existingUserWithUsername &&
+				JSON.stringify(userId) !=
+					JSON.stringify(existingUserWithUsername._id)
+			) {
 				res.status(409).json(
 					new ApiError(409, "Updating details failed.", [
 						"Username already exists.",
+					])
+				);
+				return;
+			}
+		}
+		if (data?.email) {
+			const existingUserWithEmail = await User.findOne<IUser>({
+				email: data.email,
+			});
+			if (
+				existingUserWithEmail &&
+				JSON.stringify(userId) !=
+					JSON.stringify(existingUserWithEmail._id)
+			) {
+				res.status(409).json(
+					new ApiError(409, "Updating details failed.", [
+						"Email already exists.",
 					])
 				);
 				return;
@@ -183,7 +153,9 @@ export const updatePassword = asyncHandler(
 			return;
 		}
 		const user = await User.findById(userId).orFail();
-		const isPasswordCorrect = user.isPasswordCorrect(data.current_password);
+		const isPasswordCorrect = await user.isPasswordCorrect(
+			data.current_password
+		);
 		if (!isPasswordCorrect) {
 			res.status(606).json(
 				new ApiError(606, "Incorrect current password.", [

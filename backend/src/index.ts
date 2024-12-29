@@ -4,7 +4,11 @@ import cleanedEnv from "./config/cleanedEnv";
 import app from "./app";
 
 mongoose
-	.connect(cleanedEnv!.MONGODB_URL, { dbName: cleanedEnv!.DB_NAME })
+	.connect(cleanedEnv!.MONGODB_URL, {
+		dbName: cleanedEnv!.DB_NAME,
+		replicaSet: "rs0", //to use transactions replicaSet has to be used and directConnection need to be true incase of db inside of docker.
+		directConnection: true,
+	})
 	.then((connection) => {
 		console.log(
 			"Connected to MongoDB at ",

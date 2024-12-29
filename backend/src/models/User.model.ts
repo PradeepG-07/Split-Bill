@@ -59,9 +59,8 @@ const userSchema = new Schema<IUser>(
 		],
 		friends: [
 			{
-				friend_id: {
-					type: Schema.Types.ObjectId,
-					ref: "User",
+				username: {
+					type: Schema.Types.String,
 				},
 				friends_from: {
 					type: Schema.Types.Date,

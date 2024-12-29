@@ -1,7 +1,6 @@
 import { RequestHandler, Router } from "express";
 import {
 	getDetails,
-	getFriendsDetails,
 	getOtherUserDetails,
 	updateDetails,
 	updatePassword,
@@ -12,11 +11,10 @@ import { profilePicUpload } from "../middlewares/multer.middleware";
 const userRouter = Router();
 
 userRouter.get("/get-details", getDetails as RequestHandler);
-userRouter.get("/get-friends-details", getFriendsDetails as RequestHandler);
 userRouter.patch("/update-password", updatePassword as RequestHandler);
 userRouter.post(
 	"/update-profile-pic",
-	profilePicUpload.single("new_profile_pic"),
+	profilePicUpload as RequestHandler,
 	updateProfilePic as RequestHandler
 );
 userRouter.put("/update-details", updateDetails as RequestHandler);
