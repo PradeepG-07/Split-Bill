@@ -49,11 +49,17 @@ const updateDetailsSchema = z.object({
 	username: z.string().optional(),
 	email: z.string().email({ message: "Invalid email format." }).optional(),
 });
+
+const respondToFriendInvitationSchema = z.object({
+	id: z.string({ message: "Friend Invitation id required." }),
+	status: z.enum(["accept", "reject"], { message: "Invalid status." }),
+});
 export {
 	envSchema,
 	signUpSchema,
 	loginSchema,
 	updatePasswordSchema,
 	updateDetailsSchema,
+	respondToFriendInvitationSchema,
 };
 
